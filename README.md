@@ -10,5 +10,6 @@ Thành viên:
 | Trần Minh Đức | 21002134 |  Leader + Tìm hiểu và xây dựng thuật toán |
 | Nguyễn Mạnh Tuấn | 21002179 | Xây dựng mô hình hồi quy |
 | Lê Quốc Lâm | 21002153 | Frontend |
-| Lê Gia Huy |   | Phân tích dữ liệu |
+| Lê Gia Huy | 21002149  | Phân tích dữ liệu |
+
 
