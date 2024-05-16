@@ -60,9 +60,6 @@ def plot_comment_counts(data, num_records):
     # for i, value in enumerate(data.iloc[:, -1]):
     #     plt.annotate(str(round(value, 2)), xy=(i, value), xytext=(0, 3), textcoords='offset points', ha='center', va='bottom')
     # st.pyplot(plt)
-    for i in range(len(data) - 1):
-        plt.plot([i, i + 1], [data.iloc[i, -1], data.iloc[i + 1, -1]], color='gray')
-    
     # Add specific values on top of each bar
     for i, value in enumerate(data.iloc[:, -1]):
         plt.annotate(str(round(value, 2)), xy=(i, value), xytext=(0, 3), textcoords='offset points', ha='center', va='bottom')
