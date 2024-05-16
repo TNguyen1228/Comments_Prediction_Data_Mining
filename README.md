@@ -10,6 +10,6 @@ Thành viên:
 
 - Nguyễn Mạnh Tuấn: Xây dựng mô hình hồi quy
 
-- Lê Quốc Lâm: Frontend
+- Lê Quốc Lâm - 2100253: Frontend
 
 - Lê Gia Huy: Phân tích dữ liệu
