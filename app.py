@@ -4,8 +4,12 @@ import joblib # load joblib model
 import streamlit as st # Streamlit app
 import pandas as pd #read file
 import numpy as np # calculator
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.metrics import mean_squared_error #import mse library
 from random_forest import RandomForestRegressor
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 #  Title
 st.markdown("<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>", unsafe_allow_html=True)
 st.markdown("<h1><i class='fa fa-comment'></i> Comments Prediction</h1>", unsafe_allow_html=True)
@@ -14,8 +18,8 @@ st.sidebar.title('Options')
 uploaded_file = st.sidebar.file_uploader("CSV file", type=['csv'])
 # model list
 models = {
-    "Random Forest Regressor":"model1",
-    "Decision Tree Regressor":"model2"
+    "Random Forest Regressor":"Random Forest Regressor",
+    "Decision Tree Regressor":"Decision Tree Regressor"
     #add more models
 }
 # sidebar actions
@@ -25,6 +29,33 @@ selected_model_name = models[selected_model]
 @st.cache(allow_output_mutation=True)  # Cache (faster process)
 def load_model(model_name):
     return joblib.load(f'Models/{model_name.lower().replace(" ", "_")}_model.joblib')
+# PCA
+def plot_pca(data):
+    scaler = StandardScaler()
+    data_scaled = scaler.fit_transform(data)
+    pca = PCA(n_components=2)
+    pca_result = pca.fit_transform(data_scaled)
+    pca_df = pd.DataFrame(data=pca_result, columns=['PC1', 'PC2'])
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(x='PC1', y='PC2', data=pca_df)
+    plt.title('PCA of Dataset')
+    plt.xlabel('Principal Component 1')
+    plt.ylabel('Principal Component 2')
+    st.pyplot(plt)
+# Draw histtogram of Target column
+def plot_histogram(data):
+    plt.figure(figsize=(10, 6))
+    sns.histplot(data.iloc[:, -1], bins=30, kde=True)
+    plt.title('Histogram of Target')
+    plt.xlabel('Target')
+    plt.ylabel('Frequency')
+    st.pyplot(plt)
+# def plot_corr(data):
+#     plt.figure(figsize=(12, 10))
+#     corr_matrix = data.iloc[:, 50:-1].corr()
+#     sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
+#     plt.title('Correlation Matrix')
+#     st.pyplot(plt)
 # Process
 if uploaded_file is not None:
     # read file and preprocess data
@@ -32,13 +63,23 @@ if uploaded_file is not None:
     data = data.fillna(1) #replace NaN with 1
     data_cut = data.iloc[:, 50:-1] # drop the first 50 cols and the last col (target columm)
     st.write("Uploaded Data:")
-    # print
+    # print data and visuallize data 
     st.write(data)
+    st.sidebar.subheader("Visualization Options")
+    if st.sidebar.checkbox("PCA Plot"):
+        plot_pca(data_cut)
+    if st.sidebar.checkbox("Histogram of Target"):
+        plot_histogram(data)
+    # if st.sidebar.checkbox("Correlation Matrix"):
+    #     plot_corr(data)
+    # if st.sidebar.checkbox("Box Plot of First 10 Features"):
+    #     plot_box(data)
     # load model
     model = load_model(selected_model)
     # predict
     X = data_cut.values #input 
     predictions = model.predict(X)
+    predictions_rounded=np.round(predictions).astype(int)
     # calc MSE
     target_column = data.iloc[:, -1] #take out target_column
     y_mean = np.mean(target_column)
@@ -47,10 +88,12 @@ if uploaded_file is not None:
     # table of result
     result_df = pd.DataFrame({
          **{f'Feature_{i+1}': data_cut[col] for i, col in enumerate(data_cut.columns)},
-         'Predicted Label': predictions
+         'Predicted Label': predictions_rounded
      })
     # print
-    st.write(f"Result {type(selected_model_name).__name__}:")
+    st.write("> The first 50 columns : Average,Standard deviation, min, max and median of the Attribute 51 to 60 for the source of the current blog post")
+    st.write("> We drop the first 50 columns")
+    st.write(f"Result {selected_model}:")
     st.write(result_df)
     st.write("MSE:", mse)
     st.write(f"MSE_baseline:", mse_baseline)
