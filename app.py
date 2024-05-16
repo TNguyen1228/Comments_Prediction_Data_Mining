@@ -43,13 +43,16 @@ def plot_pca(data):
     plt.ylabel('Principal Component 2')
     st.pyplot(plt)
 # Draw histtogram of Target column
-def plot_histogram(data):
+def plot_comment_counts(data, num_records):
     plt.figure(figsize=(10, 6))
-    sns.histplot(data.iloc[:, -1], bins=30, kde=True)
-    plt.title('Histogram of Target')
-    plt.xlabel('Target')
-    plt.ylabel('Frequency')
+    colors = sns.color_palette("husl", len(data.iloc[:, -1]))
+    plt.bar(range(len(data)), data.iloc[:, -1], color=colors)
+    plt.xlabel('Record Index')
+    plt.ylabel('Comment Count')
+    plt.title('Number of Comments for Each Record')
+    plt.xticks(np.arange(0, len(data), step=len(data)//15))  # Adjust x ticks
     st.pyplot(plt)
+
 # def plot_corr(data):
 #     plt.figure(figsize=(12, 10))
 #     corr_matrix = data.iloc[:, 50:-1].corr()
@@ -68,8 +71,10 @@ if uploaded_file is not None:
     st.sidebar.subheader("Visualization Options")
     if st.sidebar.checkbox("PCA Plot"):
         plot_pca(data_cut)
-    if st.sidebar.checkbox("Histogram of Target"):
-        plot_histogram(data)
+    if st.sidebar.checkbox("Plot Comment Counts"):
+        num_records = st.sidebar.slider("Select number of records to display", 10, 50, 10)  # Slider for selecting number of records
+        plot_comment_counts(data.head(num_records), num_records)
+
     # if st.sidebar.checkbox("Correlation Matrix"):
     #     plot_corr(data)
     # if st.sidebar.checkbox("Box Plot of First 10 Features"):
