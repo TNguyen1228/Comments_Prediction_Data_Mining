@@ -50,18 +50,33 @@ def plot_comment_counts(data, num_records):
     plt.xlabel('Record Index')
     plt.ylabel('Comment Count')
     plt.title('Number of Comments for Each Record')
-    if num_records<=14:
-        plt.xticks(np.arange(0, len(data), step=len(data)//10))  # Adjust x ticks
-        plt.yticks(np.arange(0, max(data.iloc[:, -1]), step=max(data.iloc[:, -1])//10))
-    else:
-        plt.xticks(np.arange(0, len(data), step=len(data)//15))  # Adjust x ticks
-        plt.yticks(np.arange(0, max(data.iloc[:, -1]), step=max(data.iloc[:, -1])//15))  # Adjust x ticks
+    # if num_records<=14:
+    #     plt.xticks(np.arange(0, len(data), step=len(data)//10))  # Adjust x ticks
+    #     # plt.yticks(np.arange(0, max(data.iloc[:, -1]), step=max(data.iloc[:, -1])//10)) 
+    # else:
+    #     plt.xticks(np.arange(0, len(data), step=len(data)//15))  # Adjust x ticks
+    #     plt.yticks(np.arange(0, max(data.iloc[:, -1]), step=max(data.iloc[:, -1])//15))  # Adjust x ticks
+    # # Add specific values on top of each bar
+    # for i, value in enumerate(data.iloc[:, -1]):
+    #     plt.annotate(str(round(value, 2)), xy=(i, value), xytext=(0, 3), textcoords='offset points', ha='center', va='bottom')
+    # st.pyplot(plt)
+    for i in range(len(data) - 1):
+        plt.plot([i, i + 1], [data.iloc[i, -1], data.iloc[i + 1, -1]], color='gray')
+    
     # Add specific values on top of each bar
     for i, value in enumerate(data.iloc[:, -1]):
         plt.annotate(str(round(value, 2)), xy=(i, value), xytext=(0, 3), textcoords='offset points', ha='center', va='bottom')
     
+    if len(data) > 0:
+        num_xticks = max(1, len(data) // 15)  # Ensure there's at least one tick
+        plt.xticks(np.arange(0, len(data), step=num_xticks))  # Adjust x ticks
+    
+    max_y = max(data.iloc[:, -1])
+    if max_y > 0:
+        num_yticks = max(1, max_y // 10)  # Ensure there's at least one tick
+        plt.yticks(np.arange(0, max_y, step=num_yticks))  # Adjust y ticks
+    
     st.pyplot(plt)
-
 # def plot_corr(data):
 #     plt.figure(figsize=(12, 10))
 #     corr_matrix = data.iloc[:, 50:-1].corr()
@@ -83,7 +98,7 @@ if uploaded_file is not None:
     if st.sidebar.checkbox("Plot Comment Counts"):
         num_records = st.sidebar.slider("Select number of records to display", 10, 30, 10)  # Slider for selecting number of records
         plot_comment_counts(data.head(num_records), num_records)
-
+    
     # if st.sidebar.checkbox("Correlation Matrix"):
     #     plot_corr(data)
     # if st.sidebar.checkbox("Box Plot of First 10 Features"):
