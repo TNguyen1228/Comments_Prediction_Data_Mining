@@ -50,7 +50,16 @@ def plot_comment_counts(data, num_records):
     plt.xlabel('Record Index')
     plt.ylabel('Comment Count')
     plt.title('Number of Comments for Each Record')
-    plt.xticks(np.arange(0, len(data), step=len(data)//15))  # Adjust x ticks
+    if num_records<=14:
+        plt.xticks(np.arange(0, len(data), step=len(data)//10))  # Adjust x ticks
+        plt.yticks(np.arange(0, max(data.iloc[:, -1]), step=max(data.iloc[:, -1])//10))
+    else:
+        plt.xticks(np.arange(0, len(data), step=len(data)//15))  # Adjust x ticks
+        plt.yticks(np.arange(0, max(data.iloc[:, -1]), step=max(data.iloc[:, -1])//15))  # Adjust x ticks
+    # Add specific values on top of each bar
+    for i, value in enumerate(data.iloc[:, -1]):
+        plt.annotate(str(round(value, 2)), xy=(i, value), xytext=(0, 3), textcoords='offset points', ha='center', va='bottom')
+    
     st.pyplot(plt)
 
 # def plot_corr(data):
@@ -72,7 +81,7 @@ if uploaded_file is not None:
     if st.sidebar.checkbox("PCA Plot"):
         plot_pca(data_cut)
     if st.sidebar.checkbox("Plot Comment Counts"):
-        num_records = st.sidebar.slider("Select number of records to display", 10, 50, 10)  # Slider for selecting number of records
+        num_records = st.sidebar.slider("Select number of records to display", 10, 30, 10)  # Slider for selecting number of records
         plot_comment_counts(data.head(num_records), num_records)
 
     # if st.sidebar.checkbox("Correlation Matrix"):
