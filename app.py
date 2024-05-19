@@ -19,7 +19,8 @@ uploaded_file = st.sidebar.file_uploader("CSV file", type=['csv'])
 # model list
 models = {
     "Random Forest Regressor":"Random Forest Regressor",
-    "Decision Tree Regressor":"Decision Tree Regressor"
+    "Decision Tree Regressor":"Decision Tree Regressor",
+    "poisson regression":"Possion Regression",
     #add more models
 }
 # sidebar actions
