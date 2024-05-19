@@ -30,57 +30,15 @@ selected_model_name = models[selected_model]
 @st.cache(allow_output_mutation=True)  # Cache (faster process)
 def load_model(model_name):
     return joblib.load(f'Models/{model_name.lower().replace(" ", "_")}_model.joblib')
-# PCA
-def plot_pca(data):
-    scaler = StandardScaler()
-    data_scaled = scaler.fit_transform(data)
-    pca = PCA(n_components=2)
-    pca_result = pca.fit_transform(data_scaled)
-    pca_df = pd.DataFrame(data=pca_result, columns=['PC1', 'PC2'])
-    plt.figure(figsize=(10, 6))
-    sns.scatterplot(x='PC1', y='PC2', data=pca_df)
-    plt.title('PCA of Dataset')
-    plt.xlabel('Principal Component 1')
-    plt.ylabel('Principal Component 2')
-    st.pyplot(plt)
 # Draw histtogram of Target column
-def plot_comment_counts(data, num_records):
+def plot_histogram(data, column_name=''):
     plt.figure(figsize=(10, 6))
-    colors = sns.color_palette("husl", len(data.iloc[:, -1]))
-    plt.bar(range(len(data)), data.iloc[:, -1], color=colors)
-    plt.xlabel('Record Index')
-    plt.ylabel('Comment Count')
-    plt.title('Number of Comments for Each Record')
-    # if num_records<=14:
-    #     plt.xticks(np.arange(0, len(data), step=len(data)//10))  # Adjust x ticks
-    #     # plt.yticks(np.arange(0, max(data.iloc[:, -1]), step=max(data.iloc[:, -1])//10)) 
-    # else:
-    #     plt.xticks(np.arange(0, len(data), step=len(data)//15))  # Adjust x ticks
-    #     plt.yticks(np.arange(0, max(data.iloc[:, -1]), step=max(data.iloc[:, -1])//15))  # Adjust x ticks
-    # # Add specific values on top of each bar
-    # for i, value in enumerate(data.iloc[:, -1]):
-    #     plt.annotate(str(round(value, 2)), xy=(i, value), xytext=(0, 3), textcoords='offset points', ha='center', va='bottom')
-    # st.pyplot(plt)
-    # Add specific values on top of each bar
-    for i, value in enumerate(data.iloc[:, -1]):
-        plt.annotate(str(round(value, 2)), xy=(i, value), xytext=(0, 3), textcoords='offset points', ha='center', va='bottom')
-    
-    if len(data) > 0:
-        num_xticks = max(1, len(data) // 15)  # Ensure there's at least one tick
-        plt.xticks(np.arange(0, len(data), step=num_xticks))  # Adjust x ticks
-    
-    max_y = max(data.iloc[:, -1])
-    if max_y > 0:
-        num_yticks = max(1, max_y // 10)  # Ensure there's at least one tick
-        plt.yticks(np.arange(0, max_y, step=num_yticks))  # Adjust y ticks
-    
+    sns.histplot(data, bins=20, kde=True)
+    plt.title(f'Histogram of {column_name}')
+    plt.xlabel(column_name)
+    plt.ylabel('Frequency')
+    plt.xlim(0, 200)
     st.pyplot(plt)
-# def plot_corr(data):
-#     plt.figure(figsize=(12, 10))
-#     corr_matrix = data.iloc[:, 50:-1].corr()
-#     sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
-#     plt.title('Correlation Matrix')
-#     st.pyplot(plt)
 # Process
 if uploaded_file is not None:
     # read file and preprocess data
@@ -91,12 +49,8 @@ if uploaded_file is not None:
     # print data and visuallize data 
     st.write(data)
     st.sidebar.subheader("Visualization Options")
-    if st.sidebar.checkbox("PCA Plot"):
-        plot_pca(data_cut)
-    if st.sidebar.checkbox("Plot Comment Counts"):
-        num_records = st.sidebar.slider("Select number of records to display", 10, 30, 10)  # Slider for selecting number of records
-        plot_comment_counts(data.head(num_records), num_records)
-    
+    if st.sidebar.checkbox("Histogram of Target"):
+        plot_histogram(data.iloc[:, -1], 'Target')
     # if st.sidebar.checkbox("Correlation Matrix"):
     #     plot_corr(data)
     # if st.sidebar.checkbox("Box Plot of First 10 Features"):
@@ -117,6 +71,8 @@ if uploaded_file is not None:
          **{f'Feature_{i+1}': data_cut[col] for i, col in enumerate(data_cut.columns)},
          'Predicted Label': predictions_rounded
      })
+    if st.sidebar.checkbox("Histogram of Predicted Labels"):
+        plot_histogram(result_df['Predicted Label'], 'Predicted Label')
     # print
     st.write("> The first 50 columns : Average,Standard deviation, min, max and median of the Attribute 51 to 60 for the source of the current blog post")
     st.write("> We drop the first 50 columns")
