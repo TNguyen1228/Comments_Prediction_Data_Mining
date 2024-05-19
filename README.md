@@ -1,6 +1,6 @@
 # Blog comment prediction
 
-Nội dung: Thực hiện bài toán hồi quy dự đoán số bình luận trong 1 bài viết sau 1 khoảng thời gian, ứng dụng vào [Reddit](reddit.com)
+Nội dung: Thực hiện bài toán hồi quy dự đoán số bình luận trong 1 bài viết sau 1 khoảng thời gian, ứng dụng vào [Reddit](https://www.reddit.com/)
 
 Dữ liệu sử dụng: https://archive.ics.uci.edu/dataset/304/blogfeedback
 
