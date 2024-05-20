@@ -51,7 +51,7 @@ if url:
         try:
             subreddit = reddit.subreddit(sub_reddit_name)
             # Attempt to fetch subreddit info to verify it exists
-            subreddit.display_name  # This will throw an exception if the subreddit doesn't exist
+            # subreddit.display_name  # This will throw an exception if the subreddit doesn't exist
             
             st.write("Subreddit name: " + sub_reddit_name)
             input_model = crawl_and_add_binary_features(url)
