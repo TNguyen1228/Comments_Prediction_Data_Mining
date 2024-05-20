@@ -21,7 +21,7 @@ or download directly instead.
 Create a virtual environment and install the required packages:
 
 ```
-pip install -r requirement.txt
+pip install -r requirements.txt
 ```
 
 ## Run Jupyter notebooks
