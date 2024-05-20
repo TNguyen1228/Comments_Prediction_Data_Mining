@@ -41,22 +41,27 @@ selected_model = st.sidebar.selectbox("Choose model", list(models.keys()))
 selected_model_name = models[selected_model]
 
 # Model config
-@st.cache(allow_output_mutation=True)  # Cache (faster process)
+@st.cache_data  # Cache (faster process)
 def load_model(model_name):
     return joblib.load(f'Models/{model_name.lower().replace(" ", "_")}_model.joblib')
 
-if url :
-    sub_reddit_name=get_subreddit_name(url=url)
-    subreddit = reddit.subreddit(sub_reddit_name)
-    st.write("Subreddit name: " + sub_reddit_name)
-    
-    input_model = crawl_and_add_binary_features(url)
-
-    st.write(f"Data:\n")
-    
-    st.write(input_model)
-
-    model = load_model(selected_model)
-
-    st.write("Number of comments in the next 24 hours: " + str(np.round(model.predict(input_model)).astype(int)))
-
+if url:
+    sub_reddit_name = get_subreddit_name(url)
+    if sub_reddit_name:
+        try:
+            subreddit = reddit.subreddit(sub_reddit_name)
+            # Attempt to fetch subreddit info to verify it exists
+            subreddit.display_name  # This will throw an exception if the subreddit doesn't exist
+            
+            st.write("Subreddit name: " + sub_reddit_name)
+            input_model = crawl_and_add_binary_features(url)
+            st.write(f"Data:\n")
+            st.write(input_model)
+            
+            model = load_model(selected_model)
+            st.write("Number of comments in the next 24 hours: " + str(np.round(model.predict(input_model)).astype(int)))
+        
+        except praw.exceptions.PRAWException as e:
+            st.error("Error accessing the subreddit. Please check the URL and try again.")
+    else:
+        st.error("Invalid URL. Please enter a valid Reddit URL.")
