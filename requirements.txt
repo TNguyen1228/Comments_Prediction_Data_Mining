@@ -1,6 +1,7 @@
 matplotlib
-pandas
-scikit-learn
-seaborn
-streamlit
-praw
+pandas==2.2.2
+scikit-learn==1.3.2
+seaborn==0.13.2
+streamlit==1.33.0
+praw==7.7.1
+numpy==1.24.3
