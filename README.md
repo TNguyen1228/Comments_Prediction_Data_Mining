@@ -50,6 +50,8 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 ## Contact
 
+If you have any question, please contact us via phone or email below:
+
 Trần Minh Đức, 0344794259, tranminhduc5_t66@hus.edu.vn
 
 Nguyễn Mạnh Tuấn, 0349292753, nguyenmanhtuan_t66@hus.edu.vn
