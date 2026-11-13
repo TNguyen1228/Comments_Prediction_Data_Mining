@@ -1,3 +1,5 @@
+import json
+import os
 from credentials import client_id, client_secret, username, password, user_agent
 import praw
 from datetime import datetime, timedelta
@@ -9,6 +11,11 @@ reddit = praw.Reddit(client_id=client_id,
                      username=username,
                      password=password,
                     user_agent= user_agent)
+
+# The 200 words fitted on the crawled corpus (crawl/reddit_comments.csv) by reddit-crawler.ipynb.
+# They define the fixed meaning and order of the 200 bag-of-words columns.
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'vocabulary.json'), encoding='utf-8') as f:
+    VOCABULARY = json.load(f)
 
 def get_post_urls(subreddit_name, limit=100):
     subreddit = reddit.subreddit(subreddit_name)
@@ -77,25 +84,12 @@ def crawl_and_add_binary_features(post_url):
     # Drop the 'text' column from the original DataFrame
     df = df.drop('text', axis=1)
 
-    # Initialize the CountVectorizer to get the 200 most frequent words
-    vectorizer = CountVectorizer(max_features=200, binary=True)
-    try:
-        X = vectorizer.fit_transform(texts)
+    # Binary features for the fixed 200-word vocabulary (transform only, never refit on a single post)
+    vectorizer = CountVectorizer(vocabulary=VOCABULARY, binary=True)
+    X = vectorizer.transform(texts)
 
-        # Get the feature names (the 200 most frequent words)
-        feature_names = vectorizer.get_feature_names_out()
-
-        # Create a DataFrame with the binary features
-        binary_features_df = pd.DataFrame(X.toarray(), columns=feature_names)
-    except ValueError:
-        # Empty vocabulary: the post has no text (link, image or video post)
-        binary_features_df = pd.DataFrame(index=df.index)
-
-    # Ensure binary_features_df has exactly 200 columns
-    num_features = binary_features_df.shape[1]
-    if num_features < 200:
-        for i in range(200 - num_features):
-            binary_features_df[f'extra_feature_{i}'] = 0
+    # Create a DataFrame with the binary features (all zeros when the post has no text)
+    binary_features_df = pd.DataFrame(X.toarray(), columns=VOCABULARY)
 
     # Find the insertion point (after 'Post Length' column)
     insertion_index = df.columns.get_loc('Post Length') + 1
