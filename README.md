@@ -36,7 +36,7 @@ In [Models](https://github.com/TranMinhDuc190103/Data_mining_finals/tree/main/Mo
 
 You can self crawl some data from Reddit by running [reddit-crawler.ipynb](https://github.com/TranMinhDuc190103/Data_mining_finals/blob/main/crawl/reddit-crawler.ipynb) in folder `crawl` to crawl data from Reddit. However you need some key from Reddit app to continue.
 
-The `credentials.py` contain some infomation to interact with Reddit API. Due to security concerns, we are unable to provide complete information. Please contact us for further details.
+The `credentials.py` contain some infomation to interact with Reddit API. Due to security concerns, it is not included in this repository: copy `credentials.example.py` to `credentials.py` and fill in the keys of your own Reddit app.
 
 ## Run the app
 

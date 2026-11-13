@@ -11,7 +11,7 @@ class RandomForestRegressor():
     def __init__(
         self,
         n_estimators=100,
-        criterion='mse', 
+        criterion='squared_error',
         max_depth=None,
         min_samples_leaf=1,
         max_features='sqrt', 
@@ -23,7 +23,7 @@ class RandomForestRegressor():
         
         Args:
             n_estimators (int): The number of trees in the forest.
-            criterion (str): The function to measure the quality of a split ('mse' for mean squared error).
+            criterion (str): The function to measure the quality of a split ('squared_error' for mean squared error).
             max_depth (int): The maximum depth of the tree.
             min_samples_leaf (int): The minimum number of samples required to be at a leaf node.
             max_features (str): The number of features to consider when looking for the best split; 'sqrt' for square root.
@@ -41,9 +41,7 @@ class RandomForestRegressor():
     def fit(self, X, y):
         """Fit the random forest model."""
         self.n_samples, self.n_features = X.shape
-        if self.max_features == 'sqrt':
-            self.max_feature = int(np.sqrt(self.n_features))
-        
+
         self.trees = []
         for i in range(self.n_estimators):
             X_train, _, y_train, _ = train_test_split(

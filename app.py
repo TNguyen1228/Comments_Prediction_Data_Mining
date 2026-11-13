@@ -44,7 +44,10 @@ if uploaded_file is not None:
     # read file and preprocess data
     data = pd.read_csv(uploaded_file,header=None)
     data = data.fillna(1) #replace NaN with 1
-    data_cut = data.iloc[:, 50:-1] # drop the first 50 cols and the last col (target columm)
+    # keep the 221 feature columns the models were trained on (see Models/*.ipynb):
+    # drop the first 50 cols, cols 56-60, cols 277-280 and the last col (target columm)
+    cols_to_remove = list(range(0, 50)) + list(range(55, 60)) + list(range(276, 280))
+    data_cut = data.drop(columns=data.columns[cols_to_remove]).iloc[:, :-1]
     st.write("Uploaded Data:")
     # print data and visuallize data 
     st.write(data)
@@ -75,7 +78,7 @@ if uploaded_file is not None:
         plot_histogram(result_df['Predicted Label'], 'Predicted Label')
     # print
     st.write("> The first 50 columns : Average,Standard deviation, min, max and median of the Attribute 51 to 60 for the source of the current blog post")
-    st.write("> We drop the first 50 columns")
+    st.write("> We drop the first 50 columns, columns 56-60 (links) and columns 277-280 (parent pages)")
     st.write(f"Result {selected_model}:")
     st.write(result_df)
     st.write("MSE:", mse)
