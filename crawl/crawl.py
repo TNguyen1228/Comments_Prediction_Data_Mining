@@ -79,13 +79,17 @@ def crawl_and_add_binary_features(post_url):
 
     # Initialize the CountVectorizer to get the 200 most frequent words
     vectorizer = CountVectorizer(max_features=200, binary=True)
-    X = vectorizer.fit_transform(texts)
+    try:
+        X = vectorizer.fit_transform(texts)
 
-    # Get the feature names (the 200 most frequent words)
-    feature_names = vectorizer.get_feature_names_out()
+        # Get the feature names (the 200 most frequent words)
+        feature_names = vectorizer.get_feature_names_out()
 
-    # Create a DataFrame with the binary features
-    binary_features_df = pd.DataFrame(X.toarray(), columns=feature_names)
+        # Create a DataFrame with the binary features
+        binary_features_df = pd.DataFrame(X.toarray(), columns=feature_names)
+    except ValueError:
+        # Empty vocabulary: the post has no text (link, image or video post)
+        binary_features_df = pd.DataFrame(index=df.index)
 
     # Ensure binary_features_df has exactly 200 columns
     num_features = binary_features_df.shape[1]

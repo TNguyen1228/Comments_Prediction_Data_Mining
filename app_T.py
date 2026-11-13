@@ -1,10 +1,10 @@
 import joblib
 import numpy as np
 import streamlit as st
-import re
 from credentials import client_id, client_secret, username, password, user_agent
 from crawl.crawl import crawl_and_add_binary_features
 import praw
+import prawcore
 import sys #lead to model_path
 from Models.random_forest import RandomForestRegressor
 
@@ -15,10 +15,11 @@ reddit = praw.Reddit(client_id=client_id,
                      password=password,
                     user_agent= user_agent)
 
-def get_subreddit_name(url):
-    regex = r"https:\/\/www\.reddit\.com\/r\/([^/]+)"
-    match = re.search(regex, url)
-    return match.group(1) if match else None
+@st.cache_data(ttl=600)  # Do not re-crawl the same post on every rerun
+def crawl_post(url):
+    # praw raises InvalidURL if the URL is not a Reddit post URL
+    sub_reddit_name = reddit.submission(url=url).subreddit.display_name
+    return sub_reddit_name, crawl_and_add_binary_features(url)
 
 # model list
 models = {
@@ -41,27 +42,22 @@ selected_model = st.sidebar.selectbox("Choose model", list(models.keys()))
 selected_model_name = models[selected_model]
 
 # Model config
-@st.cache_data  # Cache (faster process)
+@st.cache_resource  # Cache (faster process)
 def load_model(model_name):
     return joblib.load(f'Models/{model_name.lower().replace(" ", "_")}_model.joblib')
 
 if url:
-    sub_reddit_name = get_subreddit_name(url)
-    if sub_reddit_name:
-        try:
-            subreddit = reddit.subreddit(sub_reddit_name)
-            # Attempt to fetch subreddit info to verify it exists
-            # subreddit.display_name  # This will throw an exception if the subreddit doesn't exist
-            
-            st.write("Subreddit name: " + sub_reddit_name)
-            input_model = crawl_and_add_binary_features(url)
-            st.write(f"Data:\n")
-            st.write(input_model)
-            
-            model = load_model(selected_model)
-            st.write("Number of comments in the next 24 hours: " + str(np.round(model.predict(input_model)).astype(int)))
-        
-        except praw.exceptions.PRAWException as e:
-            st.error("Error accessing the subreddit. Please check the URL and try again.")
-    else:
-        st.error("Invalid URL. Please enter a valid Reddit URL.")
+    try:
+        sub_reddit_name, input_model = crawl_post(url)
+
+        st.write("Subreddit name: " + sub_reddit_name)
+        st.write(f"Data:\n")
+        st.write(input_model)
+
+        model = load_model(selected_model)
+        st.write("Number of comments in the next 24 hours: " + str(np.round(model.predict(input_model)).astype(int)))
+
+    except praw.exceptions.InvalidURL:
+        st.error("Invalid URL. Please enter a valid Reddit post URL.")
+    except (praw.exceptions.PRAWException, prawcore.exceptions.PrawcoreException) as e:
+        st.error("Error accessing the subreddit. Please check the URL and try again.")
